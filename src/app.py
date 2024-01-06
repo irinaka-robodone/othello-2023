@@ -26,7 +26,7 @@ class App:
         self.current_player = 1
         self.board_size = 8
         # ゲーム開始
-        
+    
         pyxel.run(self.update, self.draw)
         
         
@@ -47,11 +47,14 @@ class App:
                 if self.is_valid_move(y, x):
                     self.place_koma(x, y)
                     self.switch_player()
+                    
     
     def is_valid_move(self, row, col):
         # 有効な移動かチェックするロジック
         # "self.board"が0だったら置けるようにする
         return self.board[row][col] == 0
+    
+
 
     def place_koma(self, x, y):
         self.board[y][x] = self.current_player
@@ -78,6 +81,8 @@ class App:
             for y, x in pieces_to_flip:
                 print(x, y)
                 self.board[y][x] = self.current_player
+        
+        
                 
         
     def switch_player(self):

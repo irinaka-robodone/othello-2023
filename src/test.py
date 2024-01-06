@@ -40,7 +40,7 @@ class OthelloGame:
                 if self.board[row][col] != 0:
                     color = 0 if self.board[row][col] == 1 else 7  # プレイヤー1は黒、プレイヤー2は白
                     pyxel.circ(x + self.cell_size // 2, y + self.cell_size // 2, self.cell_size // 2 - 2, color)
-
+    
 
 if __name__ == "__main__":
     OthelloGame()
