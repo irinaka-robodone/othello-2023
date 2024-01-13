@@ -29,4 +29,4 @@ jobs:
     - name: Rename the pyxapp file.
       run: mv ./src.pyxapp ./othello-2023.pyxapp
     - name: Convert *.pyxapp to an executable single html file.
-      run: pyxel app2html ./othello-2023.pyxapp ./othello-2023.html
+      run: pyxel app2html ./othello-2023.pyxapp
