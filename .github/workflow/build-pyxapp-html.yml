@@ -1,0 +1,30 @@
+name: Publish Python 🐍 distributions 📦 to PyPI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-n-publish:
+    name: Build and publish Python 🐍 distributions 📦 to PyPI
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      id-token: write
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.x
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+    - name: Install the lastes version of pyxel.
+      run: pip install -U pyxel
+    - name: Build a pyxapp.
+      run: pyxel package src ./src.pyxapp
+    - name: Remove an old pyxapp.
+      run: rm -rf ./othello-2023.pyxapp
+    - name: Rename the pyxapp file.
+      run: mv ./src.pyxapp ./othello-2023.pyxapp
+    - name: Convert *.pyxapp to a single executable html file.
+      run: pyxel app2html ./othello-2023.pyxapp ./othello-2023.html
