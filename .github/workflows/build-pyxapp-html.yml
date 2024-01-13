@@ -7,17 +7,17 @@ on:
 
 jobs:
   build-n-publish:
-    name: Build and publish Python 🐍 distributions 📦 to PyPI
+    name: Build pyxapp and executable single html file.
     runs-on: ubuntu-latest
     environment: release
     permissions:
       id-token: write
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python 3.x
+    - name: Set up Python 3.11
       uses: actions/setup-python@v4
       with:
-        python-version: '3.x'
+        python-version: '3.11'
     - name: Install the lastes version of pyxel.
       run: pip install -U pyxel
     - name: Build a pyxapp.
@@ -26,5 +26,5 @@ jobs:
       run: rm -rf ./othello-2023.pyxapp
     - name: Rename the pyxapp file.
       run: mv ./src.pyxapp ./othello-2023.pyxapp
-    - name: Convert *.pyxapp to a single executable html file.
+    - name: Convert *.pyxapp to an executable single html file.
       run: pyxel app2html ./othello-2023.pyxapp ./othello-2023.html
