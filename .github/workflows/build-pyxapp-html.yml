@@ -21,7 +21,7 @@ jobs:
     - name: Install the lastes version of pyxel.
       run: pip install -U pyxel
     - name: Build a pyxapp.
-      run: pyxel package src ./src.pyxapp
+      run: pyxel package src ./src/app.py
     - name: Remove an old pyxapp.
       run: rm -rf ./othello-2023.pyxapp
     - name: Rename the pyxapp file.
