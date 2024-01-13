@@ -8,8 +8,8 @@ font_path = "assets/font/umplus_j12r.bdf"
 class App:
     def __init__(self):
         # 画面サイズの設定
-        self.width = 256
-        self.height = 256
+        self.width = 320
+        self.height = 320
         self.state = "start"
         self.board = [[0 for _ in range(8)] for _ in range(8)]
         self.board[3][3] = 1
@@ -17,14 +17,16 @@ class App:
         self.board[4][3] = 2
         self.board[4][4] = 1
         
-        self.cell_size = 25
-        pyxel.init(self.width,self.height, title="オセロゲーム")
+        self.cell_size = 30
+        pyxel.init(self.width,self.height, title="オセロゲーム", display_scale=2)
         self.font = BDFRenderer(font_path)
         # フォントを日本語にする
         pyxel.mouse(True)
         # マウスを使えるようにする
         self.current_player = 1
         self.board_size = 8
+        self.player_stones = (0, 0)
+
         # ゲーム開始
     
         pyxel.run(self.update, self.draw)
@@ -33,17 +35,16 @@ class App:
         
 
     def update(self):
+        cell_size=self.cell_size
         # ゲームのロジックを更新する関数
         if self.state == "start":
             self.update_start()
-    
-        
-        
         # クリックでオセロの駒を置く     
         if self.state == "play":
+            print(self.board)
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-                x, y = pyxel.mouse_x - 28, pyxel.mouse_y - 28
-                x, y = x // 25 , y // 25
+                x, y = pyxel.mouse_x - 40, pyxel.mouse_y - 40
+                x, y = x // cell_size , y // cell_size
                 if self.is_valid_move(y, x):
                     self.place_koma(x, y)
                     self.switch_player()
@@ -52,7 +53,43 @@ class App:
     def is_valid_move(self, row, col):
         # 有効な移動かチェックするロジック
         # "self.board"が0だったら置けるようにする
-        return self.board[row][col] == 0
+        if self.board[row][col] != 0:
+            return False
+        
+        
+        
+        # 8方向のいずれかで相手のコマを挟めるかチェック
+        for dx in [-1, 0, 1]:
+                for dy in [-1, 0, 1]:
+                    if dx == 0 and dy == 0:
+                        continue
+                    if self.can_flip(row, col, dx, dy):
+                        return True
+        return False
+        
+        
+        
+        
+    def can_flip(self, row, col, dx, dy):
+        # 特定の方向に対して相手の駒を挟めるかどうかをチェック
+        x, y = col + dx, row + dy
+        has_opponent_piece = False
+        while 0 <= x < self.board_size and 0 <= y < self.board_size:
+            if self.board[y][x] == 3 - self.current_player:
+                has_opponent_piece = True
+                x += dx
+                y += dy
+            elif self.board[y][x] == self.current_player and has_opponent_piece:
+                return True
+            else:
+                break
+        return False
+    
+        
+        
+        
+        
+
     
 
 
@@ -105,21 +142,27 @@ class App:
             
     def draw_start_screen(self):
         # スタート画面の描画
-        self.font.draw_text(90, 50, "オセロゲーム", pyxel.frame_count % 15)
-        self.font.draw_text(85, 100, "Spaceでスタート", 7)
+        self.font.draw_text(120, 50, "オセロゲーム", pyxel.frame_count % 15)
+        self.font.draw_text(115, 100, "Spaceでスタート", 7)
         # オセロゲーム　spaceでスタートとでる
-
+        
+    def count_stones(self):
+        self.player_stones = (0, 0)
+        for row in range(self.board):
+            for col in range(self.board):
+                if col == 1:
+                    player_stones[0]
+                else:
+                    player_stones[0]
             
     def draw_play_screen(self):
 
         cell_size = self.cell_size
         # オセロボードの描画
-        for row in range(8):
-            for i in range(9):  # 8x8グリッドのため、9本の線を描画
-                # 水平線
-                pyxel.line(28, (i+1) * cell_size, 228, (i+1) * cell_size, 7)
-                # 垂直線
-                pyxel.line((i+1) * cell_size, 28, (i+1) * cell_size, 228, 7)
+        for i in range(9):
+            pyxel.line(40, 40 + i * cell_size, 280, 40 + i * cell_size, 7)
+            # 垂直線
+            pyxel.line(40 + i * cell_size, 40, 40 + i * cell_size, 280, 7)
         #オセロボードの描画 
     def draw_koma(self):
         
@@ -127,9 +170,9 @@ class App:
         for y, row in enumerate(self.board): #　マスの番号と中身をどちらも取り出す
             for x, koma in enumerate(row):
                 if koma == 1:
-                    pyxel.circ(28 +(x+0.4) * cell_size, 28 + (y+0.37) * cell_size, 11,7)
+                    pyxel.circ(self.cell_size +(x+0.83) * cell_size, self.cell_size + (y+0.83) * cell_size, 12,7)
                 if koma == 2:
-                    pyxel.circ(28 + (x+0.4) * cell_size, 28 + (y+0.37) * cell_size, 11,0)
+                    pyxel.circ(self.cell_size + (x+0.83) * cell_size, self.cell_size + (y+0.83) * cell_size, 12,0)
             #8x8の真ん中のところに白と黒の駒を配置 
                     
                 
