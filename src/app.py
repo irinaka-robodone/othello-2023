@@ -25,8 +25,7 @@ class App:
         # マウスを使えるようにする
         self.current_player = 1
         self.board_size = 8
-        self.player_stones = (0, 0)
-
+        self.player_stones = [0, 0]
         # ゲーム開始
     
         pyxel.run(self.update, self.draw)
@@ -48,6 +47,8 @@ class App:
                 if self.is_valid_move(y, x):
                     self.place_koma(x, y)
                     self.switch_player()
+
+            self.count_stones()
                     
     
     def is_valid_move(self, row, col):
@@ -132,6 +133,12 @@ class App:
             self.state = "play"
     #　ステートを"play"に変更する 
     
+    def draw_count(self):
+        self.font.draw_text(300, 0, str(self.player_stones[0]),7)
+        self.font.draw_text(275, 0, "白")
+        self.font.draw_text(300, 20, str(self.player_stones[1]),7)
+        self.font.draw_text(275, 20, "黒")
+        
     def draw(self):
         pyxel.cls(3)
         if self.state == "start":
@@ -139,21 +146,25 @@ class App:
         if self.state == "play":
             self.draw_play_screen()
             self.draw_koma()
+            self.draw_count()
             
     def draw_start_screen(self):
         # スタート画面の描画
         self.font.draw_text(120, 50, "オセロゲーム", pyxel.frame_count % 15)
         self.font.draw_text(115, 100, "Spaceでスタート", 7)
-        # オセロゲーム　spaceでスタートとでる
+        # オセロゲーム　spaceでスタートとでる 
         
     def count_stones(self):
-        self.player_stones = (0, 0)
-        for row in range(self.board):
-            for col in range(self.board):
-                if col == 1:
-                    player_stones[0]
-                else:
-                    player_stones[0]
+        self.player_stones = [0, 0]
+        for row in self.board:
+            for cell in row:
+                if cell == 1:
+                    self.player_stones[0] += 1
+                elif cell == 2:
+                    self.player_stones[1] += 1
+                    print(self.player_stones)
+        
+            
             
     def draw_play_screen(self):
 
