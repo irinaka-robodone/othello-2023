@@ -49,56 +49,6 @@ class App:
                     self.switch_player()
 
             self.count_stones()
-        
-            if pyxel.btnp(pyxel.KEY_P):
-                self.pass_turn()
-                
-                
-            if self.is_game_over():
-                self.show_winner()
-
-    def is_game_over(self):
-        # 盤面に空きマスがないか、どちらかのプレイヤーの駒のみで埋まっているかをチェック
-        black, white, empty = 0, 0, 0
-        for row in self.board:
-            for cell in row:
-                if cell == 1:
-                    black += 1
-                elif cell == 2:
-                    white += 1
-                else:
-                    empty += 1
-
-        if empty == 0 or black == 0 or white == 0:
-            return True
-        return False
-
-    def show_winner(self):
-        # 各プレイヤーの駒の数を数えて勝者を決定
-        black, white = 0, 0
-        for row in self.board:
-            for cell in row:
-                if cell == 1:
-                    black += 1
-                elif cell == 2:
-                    white += 1
-
-        winner = "引き分け"
-        if black > white:
-            winner = "黒の勝ち"
-        elif white > black:
-            winner = "白の勝ち"
-
-        # 勝者を画面上に表示
-        pyxel.text(50, 100, winner, 7)
-
-# ...（メイン関数）
-
-    def pass_turn(self):
-        # ターンを切り替えるロジック
-        self.current_player = 1 if self.current_player == 2 else 2
-        # 必要であればパスしたことを記録するロジックをここに追加
-
                     
     
     def is_valid_move(self, row, col):
@@ -204,10 +154,7 @@ class App:
         # スタート画面の描画
         self.font.draw_text(120, 50, "オセロゲーム", pyxel.frame_count % 15)
         self.font.draw_text(115, 100, "Spaceでスタート", 7)
-        # オセロゲーム　spaceでスタートとでる
-        
-    
-    
+        # オセロゲーム　spaceでスタートとでる 
         
     def count_stones(self):
         self.player_stones = [0, 0]
@@ -229,9 +176,7 @@ class App:
             pyxel.line(40, 40 + i * cell_size, 280, 40 + i * cell_size, 7)
             # 垂直線
             pyxel.line(40 + i * cell_size, 40, 40 + i * cell_size, 280, 7)
-        #オセロボードの描画
-        
-        
+        #オセロボードの描画 
     def draw_koma(self):
         
         cell_size = self.cell_size
@@ -241,10 +186,6 @@ class App:
                     pyxel.circ(self.cell_size +(x+0.83) * cell_size, self.cell_size + (y+0.83) * cell_size, 12,7)
                 if koma == 2:
                     pyxel.circ(self.cell_size + (x+0.83) * cell_size, self.cell_size + (y+0.83) * cell_size, 12,0)
-                if self.current_player == 1:
-                    self.font.draw_text(107, 10, "現在のターン：白", 7)
-                else:
-                    self.font.draw_text(107, 10, "現在のターン：黒", 7)
             #8x8の真ん中のところに白と黒の駒を配置 
                     
                 
