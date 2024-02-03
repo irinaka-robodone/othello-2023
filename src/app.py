@@ -12,6 +12,7 @@ class App:
         self.height = 320
         self.state = "start"
         self.board = [[0 for _ in range(8)] for _ in range(8)]
+        #8x8の真ん中のところに白と黒の駒を配置 
         self.board[3][3] = 1
         self.board[3][4] = 2
         self.board[4][3] = 2
@@ -26,6 +27,7 @@ class App:
         self.current_player = 1
         self.board_size = 8
         self.player_stones = [0, 0]
+        self.pass_count = {1: 0, 2: 0}
         # ゲーム開始
     
         pyxel.run(self.update, self.draw)
@@ -44,6 +46,12 @@ class App:
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                 x, y = pyxel.mouse_x - 40, pyxel.mouse_y - 40
                 x, y = x // cell_size , y // cell_size
+                if x < 0 or x >= 8:
+                    return
+                
+                if y < 0 or y >= 8:
+                    return
+                
                 if self.is_valid_move(y, x):
                     self.place_koma(x, y)
                     self.switch_player()
@@ -51,8 +59,15 @@ class App:
             self.count_stones()
         
             if pyxel.btnp(pyxel.KEY_P):
-                self.pass_turn()
+                if self.current_player == 1:
+                    if self.pass_count[self.current_player] < 3:
+                        self.pass_count[self.current_player] += 1  # パス回数をインクリメント
+                        self.switch_player()  # プレイヤーを切り替える
                 
+                elif self.current_player == 2:
+                    if self.pass_count[self.current_player] < 3:
+                        self.pass_count[self.current_player] += 1  # パス回数をインクリメント
+                        self.switch_player()  # プレイヤーを切り替える
                 
             if self.is_game_over():
                 self.show_winner()
@@ -199,6 +214,7 @@ class App:
             self.draw_play_screen()
             self.draw_koma()
             self.draw_count()
+            self.draw_info()
             
     def draw_start_screen(self):
         # スタート画面の描画
@@ -241,12 +257,13 @@ class App:
                     pyxel.circ(self.cell_size +(x+0.83) * cell_size, self.cell_size + (y+0.83) * cell_size, 12,7)
                 if koma == 2:
                     pyxel.circ(self.cell_size + (x+0.83) * cell_size, self.cell_size + (y+0.83) * cell_size, 12,0)
-                if self.current_player == 1:
-                    self.font.draw_text(107, 10, "現在のターン：白", 7)
-                else:
-                    self.font.draw_text(107, 10, "現在のターン：黒", 7)
-            #8x8の真ん中のところに白と黒の駒を配置 
-                    
+    
+    def draw_info(self):
+        if self.current_player == 1:
+            self.font.draw_text(107, 10, "現在のターン：白", 7)
+        else:
+            self.font.draw_text(107, 10, "現在のターン：黒", 7)
+        self.font.draw_text(50, 285, "Pキーでパス", 7)
                 
 if __name__ == "__main__":
     App()
