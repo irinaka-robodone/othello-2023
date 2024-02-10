@@ -28,6 +28,9 @@ class App:
         self.board_size = 8
         self.player_stones = [0, 0]
         self.pass_count = {1: 0, 2: 0}
+        if not self.can_place_piece(1) and not self.can_place_piece(2) or self.is_board_full():
+            self.check_game_over()
+
         # ゲーム開始
     
         pyxel.run(self.update, self.draw)
@@ -215,10 +218,12 @@ class App:
             self.draw_koma()
             self.draw_count()
             self.draw_info()
+        if self.state == "result":
+            self.draw_result()
             
     def draw_start_screen(self):
         # スタート画面の描画
-        self.font.draw_text(120, 50, "オセロゲーム", pyxel.frame_count % 15)
+        self.font.draw_text(120, 50, "オセロゲーム", 7)
         self.font.draw_text(115, 100, "Spaceでスタート", 7)
         # オセロゲーム　spaceでスタートとでる
         
@@ -264,6 +269,44 @@ class App:
         else:
             self.font.draw_text(107, 10, "現在のターン：黒", 7)
         self.font.draw_text(50, 285, "Pキーでパス", 7)
+        
+    def can_place_piece(self, player):
+        # playerが駒を置ける場所があるかどうかをチェック
+        for row in range(8):
+            for col in range(8):
+                if self.is_valid_move(row, col):
+                    return True
+        return False
+
+    def is_board_full(self):
+        # 盤面がすべて埋まっているかどうかをチェック
+        for row in range(8):
+            for col in range(8):
+                if self.board[row][col] == 0:
+                    return False
+        return True
+
+    def check_game_over(self):
+        # ゲーム終了時の勝敗判定と表示
+        black, white = self.count_pieces()
+        if black > white:
+            winner = "黒の勝ち"
+        elif white > black:
+            winner = "白の勝ち"
+        else:
+            winner = "引き分け"
+        self.winner = winner
+        print(winner)  # またはpyxel.textを使用して画面に表示
+        self.state = "result"
+
+    def count_pieces(self):
+        # 黒と白の駒の数をカウント
+        black = sum(row.count(1) for row in self.board)
+        white = sum(row.count(2) for row in self.board)
+        return black, white
+
+    def draw_result(self):
+        self.font.draw_text(100, 100, self.winner, 7)
                 
 if __name__ == "__main__":
     App()
