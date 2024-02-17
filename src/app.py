@@ -35,45 +35,34 @@ class App:
     
         pyxel.run(self.update, self.draw)
         
-        
-        
+    def reset(self):
+        self.board = [[0 for _ in range(8)] for _ in range(8)]
+        #8x8の真ん中のところに白と黒の駒を配置 
+        self.board[3][3] = 1
+        self.board[3][4] = 2
+        self.board[4][3] = 2
+        self.board[4][4] = 1
+        self.current_player = 1
+        self.player_stones = [0, 0]
+        self.pass_count = {1: 0, 2: 0}
 
     def update(self):
         cell_size=self.cell_size
         # ゲームのロジックを更新する関数
         if self.state == "start":
+            self.reset()
             self.update_start()
         # クリックでオセロの駒を置く     
         if self.state == "play":
-            print(self.board)
-            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-                x, y = pyxel.mouse_x - 40, pyxel.mouse_y - 40
-                x, y = x // cell_size , y // cell_size
-                if x < 0 or x >= 8:
-                    return
-                
-                if y < 0 or y >= 8:
-                    return
-                
-                if self.is_valid_move(y, x):
-                    self.place_koma(x, y)
-                    self.switch_player()
-
+            self.place_koma()
+            self.pass_turn()
             self.count_stones()
-        
-            if pyxel.btnp(pyxel.KEY_P):
-                if self.current_player == 1:
-                    if self.pass_count[self.current_player] < 3:
-                        self.pass_count[self.current_player] += 1  # パス回数をインクリメント
-                        self.switch_player()  # プレイヤーを切り替える
-                
-                elif self.current_player == 2:
-                    if self.pass_count[self.current_player] < 3:
-                        self.pass_count[self.current_player] += 1  # パス回数をインクリメント
-                        self.switch_player()  # プレイヤーを切り替える
-                
             if self.is_game_over():
-                self.show_winner()
+                self.check_game_over()
+        
+        if self.state == "result":
+            self.clear_game()
+        
 
     def is_game_over(self):
         # 盤面に空きマスがないか、どちらかのプレイヤーの駒のみで埋まっているかをチェック
@@ -90,6 +79,18 @@ class App:
         if empty == 0 or black == 0 or white == 0:
             return True
         return False
+    
+    def pass_turn(self):
+        if pyxel.btnp(pyxel.KEY_P):
+            if self.current_player == 1:
+                if self.pass_count[self.current_player] < 3:
+                    self.pass_count[self.current_player] += 1  # パス回数をインクリメント
+                    self.switch_player()  # プレイヤーを切り替える
+            
+            elif self.current_player == 2:
+                if self.pass_count[self.current_player] < 3:
+                    self.pass_count[self.current_player] += 1  # パス回数をインクリメント
+                    self.switch_player()  # プレイヤーを切り替える
 
     def show_winner(self):
         # 各プレイヤーの駒の数を数えて勝者を決定
@@ -106,27 +107,15 @@ class App:
             winner = "黒の勝ち"
         elif white > black:
             winner = "白の勝ち"
-
         # 勝者を画面上に表示
         pyxel.text(50, 100, winner, 7)
 
 # ...（メイン関数）
-
-    def pass_turn(self):
-        # ターンを切り替えるロジック
-        self.current_player = 1 if self.current_player == 2 else 2
-        # 必要であればパスしたことを記録するロジックをここに追加
-
-                    
-    
     def is_valid_move(self, row, col):
         # 有効な移動かチェックするロジック
         # "self.board"が0だったら置けるようにする
         if self.board[row][col] != 0:
             return False
-        
-        
-        
         # 8方向のいずれかで相手のコマを挟めるかチェック
         for dx in [-1, 0, 1]:
                 for dy in [-1, 0, 1]:
@@ -135,9 +124,6 @@ class App:
                     if self.can_flip(row, col, dx, dy):
                         return True
         return False
-        
-        
-        
         
     def can_flip(self, row, col, dx, dy):
         # 特定の方向に対して相手の駒を挟めるかどうかをチェック
@@ -153,19 +139,23 @@ class App:
             else:
                 break
         return False
-    
-        
-        
-        
-        
 
-    
-
-
-    def place_koma(self, x, y):
-        self.board[y][x] = self.current_player
-        self.flip_pieces(x, y)
+    def place_koma(self):
+        x, y = pyxel.MOUSE_POS_X, pyxel.MOUSE_POS_Y
+        if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+            x, y = pyxel.mouse_x - 40, pyxel.mouse_y - 40
+            x, y = x // self.cell_size , y // self.cell_size
+            if x < 0 or x >= 8:
+                return
             
+            if y < 0 or y >= 8:
+                return
+        
+            if self.is_valid_move(y, x):
+                self.board[y][x] = self.current_player
+                self.flip_pieces(x, y)
+                self.switch_player()
+        
     def flip_pieces(self, x, y):
         for dx in [-1, 0, 1]:
             for dy in [-1, 0, 1]:
@@ -188,13 +178,8 @@ class App:
                 print(x, y)
                 self.board[y][x] = self.current_player
         
-        
-                
-        
     def switch_player(self):
         self.current_player = 1 if self.current_player == 2 else 2
-        
-    
         
     def update_start(self):
         if pyxel.btnp(pyxel.KEY_SPACE):
@@ -239,8 +224,6 @@ class App:
                 elif cell == 2:
                     self.player_stones[1] += 1
                     print(self.player_stones)
-    
-            
             
     def draw_play_screen(self):
 
@@ -290,9 +273,9 @@ class App:
         # ゲーム終了時の勝敗判定と表示
         black, white = self.count_pieces()
         if black > white:
-            winner = "黒の勝ち"
-        elif white > black:
             winner = "白の勝ち"
+        elif white > black:
+            winner = "黒の勝ち"
         else:
             winner = "引き分け"
         self.winner = winner
@@ -304,9 +287,13 @@ class App:
         black = sum(row.count(1) for row in self.board)
         white = sum(row.count(2) for row in self.board)
         return black, white
+    
+    def clear_game(self):
+        if pyxel.btnp(pyxel.KEY_SPACE):
+            self.state = "start"
 
     def draw_result(self):
-        self.font.draw_text(100, 100, self.winner, 7)
-                
+        self.font.draw_text(130, 75 , self.winner, 7)
+            
 if __name__ == "__main__":
     App()
