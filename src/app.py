@@ -1,4 +1,7 @@
 import pyxel
+import sounddevice as sd
+import soundfile as sf
+
 from text import BDFRenderer
 
 font_path = "assets/font/umplus_j12r.bdf"
@@ -20,10 +23,13 @@ class App:
         
         self.cell_size = 30
         pyxel.init(self.width,self.height, title="オセロゲーム", display_scale=2)
-        self.font = BDFRenderer(font_path)
         # フォントを日本語にする
-        pyxel.mouse(True)
+        self.font = BDFRenderer(font_path)
         # マウスを使えるようにする
+        pyxel.mouse(True)
+        # 音のファイルを読み込む
+        click_sound = "assets/othello_sound.wav"
+        self.audio, self.sample_rate = sf.read(click_sound, always_2d=True)
         self.current_player = 1
         self.board_size = 8
         self.player_stones = [0, 0]
@@ -105,10 +111,12 @@ class App:
         winner = "引き分け"
         if black > white:
             winner = "黒の勝ち"
+            
         elif white > black:
             winner = "白の勝ち"
         # 勝者を画面上に表示
         pyxel.text(50, 100, winner, 7)
+        
 
 # ...（メイン関数）
     def is_valid_move(self, row, col):
@@ -154,6 +162,7 @@ class App:
             if self.is_valid_move(y, x):
                 self.board[y][x] = self.current_player
                 self.flip_pieces(x, y)
+                sd.play(self.audio, self.sample_rate)
                 self.switch_player()
         
     def flip_pieces(self, x, y):
@@ -252,6 +261,7 @@ class App:
         else:
             self.font.draw_text(107, 10, "現在のターン：黒", 7)
         self.font.draw_text(50, 285, "Pキーでパス", 7)
+        self.font.draw_text(120, 285, "パスは3回まで", 7)
         
     def can_place_piece(self, player):
         # playerが駒を置ける場所があるかどうかをチェック
@@ -294,6 +304,11 @@ class App:
 
     def draw_result(self):
         self.font.draw_text(130, 75 , self.winner, 7)
+        self.font.draw_text(160, 95, str(self.player_stones[0]), 7)
+        pyxel.circ(145, 100, 9, 7)
+        self.font.draw_text(160, 115, str(self.player_stones[1]), 7)
+        pyxel.circ(145, 120, 9, 0)
+        self.font.draw_text(120, 150, "Spaceで再戦", 7)
             
 if __name__ == "__main__":
     App()
