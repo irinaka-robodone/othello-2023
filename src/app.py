@@ -6,8 +6,6 @@ from text import BDFRenderer
 
 font_path = "assets/font/umplus_j12r.bdf"
 
-
-
 class App:
     def __init__(self):
         # 画面サイズの設定
@@ -147,6 +145,12 @@ class App:
             else:
                 break
         return False
+    
+    def place_random(self):
+        """AI対戦でAIが使う置けるマスがあれば、そこに石を置く関数。
+        置けなければターンをパスする。
+        """
+        pass
 
     def place_koma(self):
         x, y = pyxel.MOUSE_POS_X, pyxel.MOUSE_POS_Y
@@ -197,9 +201,9 @@ class App:
     
     def draw_count(self):
         self.font.draw_text(300, 0, str(self.player_stones[0]),7)
-        self.font.draw_text(275, 0, "白")
+        pyxel.circ(275, 9, 6, 7)
         self.font.draw_text(300, 20, str(self.player_stones[1]),7)
-        self.font.draw_text(275, 20, "黒")
+        pyxel.circ(275, 25, 6, 0)
 
 
         
