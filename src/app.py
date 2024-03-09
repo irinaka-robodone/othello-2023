@@ -6,6 +6,8 @@ from text import BDFRenderer
 
 font_path = "assets/font/umplus_j12r.bdf"
 
+
+
 class App:
     def __init__(self):
         # 画面サイズの設定
@@ -57,14 +59,14 @@ class App:
             self.reset()
             self.update_start()
         # クリックでオセロの駒を置く     
-        if self.state == "play":
+        elif self.state == "play":
             self.place_koma()
             self.pass_turn()
             self.count_stones()
             if self.is_game_over():
                 self.check_game_over()
         
-        if self.state == "result":
+        elif self.state == "result":
             self.clear_game()
         
 
@@ -145,12 +147,6 @@ class App:
             else:
                 break
         return False
-    
-    def place_random(self):
-        """AI対戦でAIが使う置けるマスがあれば、そこに石を置く関数。
-        置けなければターンをパスする。
-        """
-        pass
 
     def place_koma(self):
         x, y = pyxel.MOUSE_POS_X, pyxel.MOUSE_POS_Y
@@ -195,15 +191,15 @@ class App:
         self.current_player = 1 if self.current_player == 2 else 2
         
     def update_start(self):
-        if pyxel.btnp(pyxel.KEY_SPACE):
+        if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
             self.state = "play"
     #　ステートを"play"に変更する 
     
     def draw_count(self):
         self.font.draw_text(300, 0, str(self.player_stones[0]),7)
-        pyxel.circ(275, 9, 6, 7)
+        self.font.draw_text(275, 0, "白")
         self.font.draw_text(300, 20, str(self.player_stones[1]),7)
-        pyxel.circ(275, 25, 6, 0)
+        self.font.draw_text(275, 20, "黒")
 
 
         
@@ -222,7 +218,7 @@ class App:
     def draw_start_screen(self):
         # スタート画面の描画
         self.font.draw_text(120, 50, "オセロゲーム", 7)
-        self.font.draw_text(115, 100, "Spaceでスタート", 7)
+        self.font.draw_text(115, 100, "タップでスタート", 7)
         # オセロゲーム　spaceでスタートとでる
         
     
@@ -301,10 +297,12 @@ class App:
         black = sum(row.count(1) for row in self.board)
         white = sum(row.count(2) for row in self.board)
         return black, white
-    
+        # 
     def clear_game(self):
-        if pyxel.btnp(pyxel.KEY_SPACE):
+        # リスタートする
+        if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
             self.state = "start"
+
 
     def draw_result(self):
         self.font.draw_text(130, 75 , self.winner, 7)
@@ -312,7 +310,7 @@ class App:
         pyxel.circ(145, 100, 9, 7)
         self.font.draw_text(160, 115, str(self.player_stones[1]), 7)
         pyxel.circ(145, 120, 9, 0)
-        self.font.draw_text(120, 150, "Spaceで再戦", 7)
+        self.font.draw_text(120, 150, "タップで再戦", 7)
             
 if __name__ == "__main__":
     App()
