@@ -3,6 +3,7 @@ import sounddevice as sd
 import soundfile as sf
 
 from text import BDFRenderer
+from component import PassButton
 
 font_path = "assets/font/umplus_j12r.bdf"
 
@@ -23,6 +24,7 @@ class App:
         
         self.cell_size = 30
         pyxel.init(self.width,self.height, title="オセロゲーム", display_scale=2)
+        self.pass_button = PassButton(280, 290, 50, 20)
         # フォントを日本語にする
         self.font = BDFRenderer(font_path)
         # マウスを使えるようにする
@@ -61,8 +63,9 @@ class App:
         # クリックでオセロの駒を置く     
         elif self.state == "play":
             self.place_koma()
-            self.pass_turn()
+            self.press_pass_button()
             self.count_stones()
+            
             if self.is_game_over():
                 self.check_game_over()
         
@@ -87,16 +90,15 @@ class App:
         return False
     
     def pass_turn(self):
-        if pyxel.btnp(pyxel.KEY_P):
-            if self.current_player == 1:
-                if self.pass_count[self.current_player] < 3:
-                    self.pass_count[self.current_player] += 1  # パス回数をインクリメント
-                    self.switch_player()  # プレイヤーを切り替える
-            
-            elif self.current_player == 2:
-                if self.pass_count[self.current_player] < 3:
-                    self.pass_count[self.current_player] += 1  # パス回数をインクリメント
-                    self.switch_player()  # プレイヤーを切り替える
+        if self.current_player == 1:
+            if self.pass_count[self.current_player] < 3:
+                self.pass_count[self.current_player] += 1  # パス回数をインクリメント
+                self.switch_player()  # プレイヤーを切り替える
+        
+        elif self.current_player == 2:
+            if self.pass_count[self.current_player] < 3:
+                self.pass_count[self.current_player] += 1  # パス回数をインクリメント
+                self.switch_player()  # プレイヤーを切り替える
 
     def show_winner(self):
         # 各プレイヤーの駒の数を数えて勝者を決定
@@ -162,6 +164,7 @@ class App:
             if self.is_valid_move(y, x):
                 self.board[y][x] = self.current_player
                 self.flip_pieces(x, y)
+                print(len(self.audio), self.sample_rate)
                 sd.play(self.audio, self.sample_rate)
                 self.switch_player()
         
@@ -212,6 +215,7 @@ class App:
             self.draw_koma()
             self.draw_count()
             self.draw_info()
+            self.draw_pass_button()
         if self.state == "result":
             self.draw_result()
             
@@ -302,7 +306,22 @@ class App:
         # リスタートする
         if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
             self.state = "start"
-
+    
+    def press_pass_button(self):
+        # パスボタンを押したときの処理
+        if (self.pass_button.x <= pyxel.mouse_x <= self.pass_button.x + self.pass_button.w) and \
+            (self.pass_button.y <= pyxel.mouse_y <= self.pass_button.y + self.pass_button.h) and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                self.pass_turn()
+    
+    def draw_pass_button(self):
+        # パスボタンを描画
+        x = self.pass_button.x
+        y = self.pass_button.y
+        w = self.pass_button.w
+        h = self.pass_button.h
+        col = 7
+        pyxel.rect(x, y, w, h, col)
+        self.font.draw_text(x + 10, y + 5, "パス", 0)
 
     def draw_result(self):
         self.font.draw_text(130, 75 , self.winner, 7)
