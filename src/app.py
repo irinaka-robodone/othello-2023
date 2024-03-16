@@ -1,6 +1,4 @@
 import pyxel
-import sounddevice as sd
-import soundfile as sf
 
 from text import BDFRenderer
 from component import PassButton
@@ -30,8 +28,7 @@ class App:
         # マウスを使えるようにする
         pyxel.mouse(True)
         # 音のファイルを読み込む
-        click_sound = "assets/othello_sound.wav"
-        self.audio, self.sample_rate = sf.read(click_sound, always_2d=True)
+        pyxel.load("assets/resource.pyxres")
         self.current_player = 1
         self.board_size = 8
         self.player_stones = [0, 0]
@@ -164,8 +161,7 @@ class App:
             if self.is_valid_move(y, x):
                 self.board[y][x] = self.current_player
                 self.flip_pieces(x, y)
-                print(len(self.audio), self.sample_rate)
-                sd.play(self.audio, self.sample_rate)
+                pyxel.playm(0, loop= False)
                 self.switch_player()
         
     def flip_pieces(self, x, y):
@@ -200,9 +196,9 @@ class App:
     
     def draw_count(self):
         self.font.draw_text(300, 0, str(self.player_stones[0]),7)
-        self.font.draw_text(275, 0, "白")
+        pyxel.circ(275, 8, 7, 7)
         self.font.draw_text(300, 20, str(self.player_stones[1]),7)
-        self.font.draw_text(275, 20, "黒")
+        pyxel.circ(275, 25, 7, 0)
 
 
         
@@ -264,8 +260,8 @@ class App:
             self.font.draw_text(107, 10, "現在のターン：白", 7)
         else:
             self.font.draw_text(107, 10, "現在のターン：黒", 7)
-        self.font.draw_text(50, 285, "Pキーでパス", 7)
-        self.font.draw_text(120, 285, "パスは3回まで", 7)
+        self.font.draw_text(50, 285, "クリックしてパス", 7)
+        self.font.draw_text(160, 285, "パスは3回まで", 7)
         
     def can_place_piece(self, player):
         # playerが駒を置ける場所があるかどうかをチェック
